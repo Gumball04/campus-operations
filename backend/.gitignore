@@ -1,0 +1,19 @@
+# Backend .gitignore
+
+# Build
+target/
+
+# IDE
+*.iml
+.idea/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# Temporary
+*.tmp
