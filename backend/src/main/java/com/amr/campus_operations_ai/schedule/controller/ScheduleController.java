@@ -22,10 +22,12 @@ import com.amr.campus_operations_ai.schedule.dto.UpdateScheduleRequest;
 import com.amr.campus_operations_ai.schedule.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;

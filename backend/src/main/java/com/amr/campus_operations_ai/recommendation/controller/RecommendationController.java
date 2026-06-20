@@ -14,10 +14,12 @@ import com.amr.campus_operations_ai.recommendation.service.RecommendationService
 
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/recommendations")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class RecommendationController {
 
     private final RecommendationService recommendationService;

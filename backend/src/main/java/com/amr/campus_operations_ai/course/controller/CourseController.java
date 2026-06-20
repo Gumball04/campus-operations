@@ -22,10 +22,12 @@ import com.amr.campus_operations_ai.course.dto.UpdateCourseRequest;
 import com.amr.campus_operations_ai.course.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class CourseController {
 
     private final CourseService courseService;

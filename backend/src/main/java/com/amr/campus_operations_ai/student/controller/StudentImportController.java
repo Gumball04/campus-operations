@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import com.amr.campus_operations_ai.student.service.StudentImportService;
 
 @RestController
 @RequestMapping("/api/students/import")
+@SecurityRequirement(name = "bearerAuth")
 public class StudentImportController {
 
     private final StudentImportService importService;

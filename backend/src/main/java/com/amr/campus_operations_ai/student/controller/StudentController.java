@@ -10,9 +10,11 @@ import com.amr.campus_operations_ai.student.entity.Student;
 import com.amr.campus_operations_ai.student.service.StudentService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/students")
+@SecurityRequirement(name = "bearerAuth")
 public class StudentController {
 
     private final StudentService service;

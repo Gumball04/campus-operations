@@ -22,10 +22,12 @@ import com.amr.campus_operations_ai.room.dto.UpdateRoomRequest;
 import com.amr.campus_operations_ai.room.service.RoomService;
 
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class RoomController {
 
     private final RoomService roomService;

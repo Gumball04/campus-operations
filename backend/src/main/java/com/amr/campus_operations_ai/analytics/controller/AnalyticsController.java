@@ -13,10 +13,12 @@ import com.amr.campus_operations_ai.analytics.service.AnalyticsService;
 import com.amr.campus_operations_ai.common.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/analytics")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
