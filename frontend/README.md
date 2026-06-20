@@ -1,3 +1,11 @@
+Frontend scaffold (Vite + React + Tailwind).
+
+To run:
+
+npm install
+npm run dev
+
+The UI is a placeholder; implement pages and styles as needed.
 # Frontend (scaffold)
 
 This folder will contain a React frontend.

@@ -71,4 +71,10 @@ public class RecommendationService {
                 .reason(reason)
                 .build();
     }
+
+    public java.util.List<RecommendationResponse> recommendForAll() {
+        return scheduleRepository.findAll().stream()
+                .map(s -> recommendForSchedule(s.getId()))
+                .toList();
+    }
 }
