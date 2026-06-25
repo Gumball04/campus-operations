@@ -9,12 +9,8 @@ type SchedulesPayload = {
   conflicts: ScheduleConflict[];
 };
 
-function titleCase(value: string) {
-  return value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+function formatDay(value: string) {
+  return value.charAt(0) + value.slice(1).toLowerCase();
 }
 
 export default function Schedules() {
@@ -64,97 +60,104 @@ export default function Schedules() {
       conflictIds.add(item.firstScheduleId);
       conflictIds.add(item.secondScheduleId);
     });
-
     return { capacityIds, conflictIds };
   }, [data.capacityViolations, data.conflicts]);
 
   if (loading) {
-    return <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-slate-300">Loading schedules…</div>;
+    return <div className="panel rounded-xl p-6 text-slate-300">Loading schedules...</div>;
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-rose-400/20 bg-rose-400/10 p-8 text-rose-100">{error}</div>;
+    return <div className="panel rounded-xl border-[color:var(--danger)] p-6 text-red-100">{error}</div>;
   }
+
+  const clearSchedules = data.schedules.filter(
+    (item) => !issueMap.capacityIds.has(item.id) && !issueMap.conflictIds.has(item.id),
+  ).length;
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-glow">
-        <p className="text-xs uppercase tracking-[0.35em] text-emerald-200/80">Scheduling view</p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Conflict detection in one table</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Rows are highlighted when the same room is double-booked or when a class exceeds the room capacity.
+      <section className="panel rounded-2xl p-6">
+        <p className="section-title text-amber-400">Schedule operations</p>
+        <h1 className="mt-2 page-title">Table-first conflict view</h1>
+        <p className="mt-3 max-w-3xl page-subtitle">
+          Conflict rows are marked in red, capacity pressure is flagged in amber, and every row includes the room and
+          enrollment context needed for a quick operational decision.
         </p>
-        <div className="mt-5 flex flex-wrap gap-3 text-sm">
-          <div className="rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-amber-100">
-            {data.capacityViolations.length} capacity violations
-          </div>
-          <div className="rounded-full border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-rose-100">
-            {data.conflicts.length} schedule conflicts
-          </div>
-          <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-emerald-100">
-            {data.schedules.filter((item) => !issueMap.capacityIds.has(item.id) && !issueMap.conflictIds.has(item.id)).length} clear schedules
-          </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <span className="status-chip danger">{data.conflicts.length} conflicts</span>
+          <span className="status-chip warning">{data.capacityViolations.length} capacity alerts</span>
+          <span className="status-chip success">{clearSchedules} clear schedules</span>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/80 shadow-glow">
-        <div className="border-b border-white/10 px-6 py-4">
-          <h3 className="text-lg font-semibold text-white">All schedules</h3>
+      <section className="panel rounded-2xl p-4">
+        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+          <span className="status-chip danger">Red left border = room conflict</span>
+          <span className="status-chip warning">Amber badge = capacity pressure</span>
+          <span className="status-chip success">Green badge = clear schedule</span>
         </div>
+
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-white/5 text-slate-300">
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="px-6 py-4 font-medium">Course</th>
-                <th className="px-6 py-4 font-medium">Room</th>
-                <th className="px-6 py-4 font-medium">Time</th>
-                <th className="px-6 py-4 font-medium">Enrollment</th>
-                <th className="px-6 py-4 font-medium">Status</th>
+                <th className="text-left">Course</th>
+                <th className="text-left">Room</th>
+                <th className="text-left">Time</th>
+                <th className="text-left">Enrollment</th>
+                <th className="text-left">Status</th>
               </tr>
             </thead>
             <tbody>
               {data.schedules.map((item) => {
                 const hasCapacity = issueMap.capacityIds.has(item.id);
                 const hasConflict = issueMap.conflictIds.has(item.id);
-                const statusClass = hasConflict
-                  ? 'border-rose-400/20 bg-rose-400/10 text-rose-100'
-                  : hasCapacity
-                    ? 'border-amber-400/20 bg-amber-400/10 text-amber-100'
-                    : 'border-emerald-400/20 bg-emerald-400/10 text-emerald-100';
                 const statusText = hasConflict && hasCapacity
                   ? 'Conflict + capacity'
                   : hasConflict
                     ? 'Conflict'
                     : hasCapacity
-                      ? 'Capacity violation'
+                      ? 'Capacity pressure'
                       : 'Clear';
+                const statusClass = hasConflict
+                  ? 'status-chip danger'
+                  : hasCapacity
+                    ? 'status-chip warning'
+                    : 'status-chip success';
 
                 return (
-                  <tr key={item.id} className="border-t border-white/5">
-                    <td className="px-6 py-4">
+                  <tr key={item.id} className="bg-[#111827]">
+                    <td className={`border-l-4 ${hasConflict ? 'border-l-[color:var(--danger)]' : 'border-l-transparent'}`}>
                       <div className="font-semibold text-white">{item.courseCode}</div>
-                      <div className="text-slate-400">{item.courseName}</div>
+                      <div className="mt-1 text-sm text-slate-400">{item.courseName}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-white">{item.roomName}</div>
-                      <div className="text-slate-400">
+                    <td>
+                      <div className="font-semibold text-white">{item.roomName}</div>
+                      <div className="mt-1 text-sm text-slate-400">
                         {item.building} · Floor {item.floor} · {item.capacity} seats
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-200">
-                      <div>{titleCase(item.day)}</div>
-                      <div className="text-slate-400">
+                    <td>
+                      <div className="font-semibold text-white">{formatDay(item.day)}</div>
+                      <div className="mt-1 text-sm text-slate-400">
                         {item.startTime} - {item.endTime}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td>
                       <div className="font-semibold text-white">{item.studentCount}</div>
-                      <div className="text-slate-400">students</div>
+                      <div className="mt-1 text-sm text-slate-400">students enrolled</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}>
-                        {statusText}
-                      </span>
+                    <td>
+                      <div className={statusClass}>{statusText}</div>
+                      <div className="mt-2 text-xs leading-5 text-slate-500">
+                        {hasConflict
+                          ? 'Two classes overlap in the same room.'
+                          : hasCapacity
+                            ? 'Enrollment exceeds the assigned room capacity.'
+                            : 'No current scheduling issue detected.'}
+                      </div>
                     </td>
                   </tr>
                 );

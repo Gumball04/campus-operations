@@ -49,58 +49,76 @@ export default function Rooms() {
   }, [schedules]);
 
   if (loading) {
-    return <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-slate-300">Loading rooms…</div>;
+    return <div className="panel rounded-xl p-6 text-slate-300">Loading rooms...</div>;
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-rose-400/20 bg-rose-400/10 p-8 text-rose-100">{error}</div>;
+    return <div className="panel rounded-xl border-[color:var(--danger)] p-6 text-red-100">{error}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-glow">
-        <p className="text-xs uppercase tracking-[0.35em] text-emerald-200/80">Room inventory</p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Capacity and usage at a glance</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          This page helps explain where the recommendation engine is sending classes and which rooms are under the most pressure.
+      <section className="panel rounded-2xl p-6">
+        <p className="section-title text-amber-400">Room inventory</p>
+        <h1 className="mt-2 page-title">Rooms and capacity pressure</h1>
+        <p className="mt-3 max-w-3xl page-subtitle">
+          A dense administrative view of room size, utilization, and how often the scheduling engine is using each
+          room.
         </p>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {rooms.map((room) => {
-          const usage = usageByRoom.get(room.name) || 0;
-          const fill = Math.min(100, Math.round((usage / 4) * 100));
+      <section className="panel rounded-2xl p-4">
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th className="text-left">Room</th>
+                <th className="text-left">Location</th>
+                <th className="text-left">Capacity</th>
+                <th className="text-left">Scheduled classes</th>
+                <th className="text-left">Usage tag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rooms.map((room) => {
+                const usage = usageByRoom.get(room.name) || 0;
+                const pressure = room.capacity ? Math.min(100, Math.round((usage / 4) * 100)) : 0;
+                const tagClass =
+                  pressure >= 75
+                    ? 'status-chip danger'
+                    : pressure >= 50
+                      ? 'status-chip warning'
+                      : 'status-chip success';
+                const tagText = pressure >= 75 ? 'Heavy use' : pressure >= 50 ? 'Active' : 'Available';
 
-          return (
-            <div key={room.id} className="rounded-3xl border border-white/10 bg-slate-900/80 p-5 shadow-glow">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{room.name}</h3>
-                  <p className="mt-1 text-sm text-slate-400">
-                    {room.building} · Floor {room.floor}
-                  </p>
-                </div>
-                <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                  {room.capacity} seats
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <div className="flex justify-between text-xs text-slate-400">
-                  <span>Scheduled classes</span>
-                  <span>{usage}</span>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-white/10">
-                  <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${fill}%` }} />
-                </div>
-              </div>
-
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                Rooms in the same building are prioritized when capacity fits, which makes the recommendation story easy to explain.
-              </div>
-            </div>
-          );
-        })}
+                return (
+                  <tr key={room.id} className="bg-[#111827]">
+                    <td>
+                      <div className="font-semibold text-white">{room.name}</div>
+                      <div className="mt-1 text-sm text-slate-400">Room ID {room.id}</div>
+                    </td>
+                    <td>
+                      <div className="font-semibold text-slate-100">{room.building}</div>
+                      <div className="mt-1 text-sm text-slate-400">Floor {room.floor}</div>
+                    </td>
+                    <td>
+                      <div className="font-semibold text-white">{room.capacity}</div>
+                      <div className="mt-1 text-sm text-slate-400">seats available</div>
+                    </td>
+                    <td>
+                      <div className="font-semibold text-white">{usage}</div>
+                      <div className="mt-1 text-sm text-slate-400">scheduled classes</div>
+                    </td>
+                    <td>
+                      <div className={tagClass}>{tagText}</div>
+                      <div className="mt-2 text-xs leading-5 text-slate-500">{pressure}% relative pressure</div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

@@ -42,47 +42,52 @@ export default function Students() {
   }, []);
 
   if (loading) {
-    return <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-slate-300">Loading students…</div>;
+    return <div className="panel rounded-xl p-6 text-slate-300">Loading students...</div>;
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-rose-400/20 bg-rose-400/10 p-8 text-rose-100">{error}</div>;
+    return <div className="panel rounded-xl border-[color:var(--danger)] p-6 text-red-100">{error}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-glow">
-        <p className="text-xs uppercase tracking-[0.35em] text-emerald-200/80">Student snapshot</p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Campus population</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          A quick look at the seeded student roster that drives the dashboard totals.
+      <section className="panel rounded-2xl p-6">
+        <p className="section-title text-amber-400">Student roster</p>
+        <h1 className="mt-2 page-title">Campus population snapshot</h1>
+        <p className="mt-3 max-w-3xl page-subtitle">
+          A dense roster view keeps the demo grounded in a real campus population rather than an abstract data set.
         </p>
-        <div className="mt-5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
-          {total} total students
-        </div>
+        <div className="mt-5 status-chip success">{total} total students</div>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/80 shadow-glow">
-        <div className="border-b border-white/10 px-6 py-4">
-          <h3 className="text-lg font-semibold text-white">Latest students</h3>
-        </div>
+      <section className="panel rounded-2xl p-4">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-white/5 text-slate-300">
+          <table className="data-table">
+            <thead>
               <tr>
-                <th className="px-6 py-4 font-medium">Student #</th>
-                <th className="px-6 py-4 font-medium">Name</th>
-                <th className="px-6 py-4 font-medium">Department</th>
-                <th className="px-6 py-4 font-medium">Email</th>
+                <th className="text-left">Student #</th>
+                <th className="text-left">Name</th>
+                <th className="text-left">Department</th>
+                <th className="text-left">Email</th>
               </tr>
             </thead>
             <tbody>
               {students.map((student) => (
-                <tr key={student.id} className="border-t border-white/5">
-                  <td className="px-6 py-4 font-semibold text-white">{student.studentNumber}</td>
-                  <td className="px-6 py-4 text-slate-300">{student.fullName}</td>
-                  <td className="px-6 py-4 text-slate-400">{student.department}</td>
-                  <td className="px-6 py-4 text-slate-400">{student.email}</td>
+                <tr key={student.id} className="bg-[#111827]">
+                  <td>
+                    <div className="font-semibold text-white">{student.studentNumber}</div>
+                    <div className="mt-1 text-sm text-slate-400">Student ID {student.id}</div>
+                  </td>
+                  <td>
+                    <div className="font-semibold text-slate-100">{student.fullName}</div>
+                  </td>
+                  <td>
+                    <span className="status-chip warning">{student.department}</span>
+                  </td>
+                  <td>
+                    <div className="text-slate-300">{student.email}</div>
+                    <div className="mt-1 text-xs text-slate-500">{student.createdAt}</div>
+                  </td>
                 </tr>
               ))}
             </tbody>

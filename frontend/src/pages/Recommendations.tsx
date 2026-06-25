@@ -1,7 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { apiGet } from '../lib/api';
 import { DashboardRecommendation } from '../lib/types';
+
+function impactLabel(item: DashboardRecommendation) {
+  const spareSeats = (item.capacity ?? 0) - item.studentCount;
+  if (spareSeats >= 20) return `High impact, ${spareSeats} spare seats`;
+  if (spareSeats >= 10) return `Moderate impact, ${spareSeats} spare seats`;
+  return `Targeted fix, ${Math.max(spareSeats, 0)} spare seats`;
+}
 
 export default function Recommendations() {
   const [items, setItems] = useState<DashboardRecommendation[]>([]);
@@ -34,78 +41,74 @@ export default function Recommendations() {
     };
   }, []);
 
-  const actionable = useMemo(
-    () => items.filter((item) => item.score > 0).sort((a, b) => b.score - a.score),
-    [items],
-  );
+  const actionable = items.filter((item) => item.score > 0).sort((a, b) => b.score - a.score);
 
   if (loading) {
-    return <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-slate-300">Loading recommendations…</div>;
+    return <div className="panel rounded-xl p-6 text-slate-300">Loading recommendations...</div>;
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-rose-400/20 bg-rose-400/10 p-8 text-rose-100">{error}</div>;
+    return <div className="panel rounded-xl border-[color:var(--danger)] p-6 text-red-100">{error}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-glow">
-        <p className="text-xs uppercase tracking-[0.35em] text-emerald-200/80">Recommendation engine</p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Problem → fix → reason</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          These are the actionable moves the platform suggests after weighing capacity, availability, and building preference.
+      <section className="panel rounded-2xl p-6">
+        <p className="section-title text-amber-400">Decision support</p>
+        <h1 className="mt-2 page-title">Problem to action recommendations</h1>
+        <p className="mt-3 max-w-3xl page-subtitle">
+          Each recommendation is structured for an operational audience: the problem, the action to take, why that
+          action is correct, and the impact it will have on the schedule.
         </p>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/80 shadow-glow">
-        <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Actionable recommendations</h3>
-          <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-200">
-            {actionable.length} items
-          </div>
-        </div>
+      <section className="space-y-4">
+        {actionable.map((item) => {
+          const spareSeats = (item.capacity ?? 0) - item.studentCount;
+          return (
+            <article key={item.scheduleId} className="panel rounded-2xl p-5">
+              <div className="flex flex-col gap-3 border-b border-slate-700 pb-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div className="section-title text-slate-400">Problem</div>
+                  <div className="mt-2 text-lg font-bold text-white">{item.problem}</div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    {item.courseCode} · {item.courseName} · {item.currentRoom}
+                  </div>
+                </div>
+                <span className="status-chip success">Score {item.score}</span>
+              </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-white/5 text-slate-300">
-              <tr>
-                <th className="px-6 py-4 font-medium">Problem</th>
-                <th className="px-6 py-4 font-medium">Course</th>
-                <th className="px-6 py-4 font-medium">Current room</th>
-                <th className="px-6 py-4 font-medium">Fix</th>
-                <th className="px-6 py-4 font-medium">Reason</th>
-                <th className="px-6 py-4 font-medium">Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {actionable.map((item) => (
-                <tr key={item.scheduleId} className="border-t border-white/5">
-                  <td className="px-6 py-4">
-                    <span className="inline-flex rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-xs font-semibold text-rose-100">
-                      {item.problem}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-white">{item.courseCode}</div>
-                    <div className="text-slate-400">{item.courseName}</div>
-                    <div className="mt-1 text-xs text-slate-500">{item.studentCount} students</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-200">{item.currentRoom}</td>
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-emerald-200">{item.recommendedRoom}</div>
-                    <div className="text-slate-400">{item.capacity} seats</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-300">{item.reason}</td>
-                  <td className="px-6 py-4">
-                    <div className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                      {item.score}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <div className="panel-soft rounded-xl p-4">
+                  <div className="section-title text-slate-400">Recommended Action</div>
+                  <div className="mt-2 text-base font-semibold text-emerald-200">{item.recommendedRoom}</div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    Move the class to a room with {item.capacity} seats.
+                  </div>
+                </div>
+
+                <div className="panel-soft rounded-xl p-4">
+                  <div className="section-title text-slate-400">Reason</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">{item.reason}</div>
+                </div>
+
+                <div className="panel-soft rounded-xl p-4">
+                  <div className="section-title text-slate-400">Impact</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">{impactLabel(item)}</div>
+                </div>
+
+                <div className="panel-soft rounded-xl p-4">
+                  <div className="section-title text-slate-400">Capacity delta</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">
+                    {spareSeats > 0
+                      ? `${spareSeats} open seats after reassignment`
+                      : 'Exact fit after reassignment'}
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </section>
     </div>
   );
