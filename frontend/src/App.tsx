@@ -11,7 +11,7 @@ import Schedules from './pages/Schedules';
 import Students from './pages/Students';
 
 const navItems = [
-  { to: '/', label: 'Dashboard' },
+  { to: '/dashboard', label: 'Dashboard' },
   { to: '/schedules', label: 'Schedules' },
   { to: '/recommendations', label: 'Recommendations' },
   { to: '/rooms', label: 'Rooms' },
@@ -40,7 +40,7 @@ function Shell({ onLogout, children }: { onLogout: () => void; children: React.R
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.to === '/'}
+                end={item.to === '/dashboard'}
                 className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
               >
                 {item.label}
@@ -104,8 +104,9 @@ export default function App() {
 
   const routes = (
     <Routes>
-      <Route path="/login" element={<Login onSuccess={() => navigate('/')} />} />
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/login" element={<Login onSuccess={() => navigate('/dashboard')} />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/schedules" element={<Schedules />} />
       <Route path="/recommendations" element={<Recommendations />} />
       <Route path="/rooms" element={<Rooms />} />
@@ -120,7 +121,7 @@ export default function App() {
   }
 
   if (token && onLoginPage) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return token ? <Shell onLogout={logout}>{routes}</Shell> : routes;
