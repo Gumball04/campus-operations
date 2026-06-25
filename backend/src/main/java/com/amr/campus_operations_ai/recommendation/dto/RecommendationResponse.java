@@ -13,8 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendationResponse {
+    private Long scheduleId;
+    private String courseCode;
+    private String courseName;
+    private Integer studentCount;
+    private String problem;
     private String currentRoom;
     private String recommendedRoom;
     private Integer capacity;
+    private Integer score;
     private String reason;
 }

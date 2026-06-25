@@ -36,6 +36,10 @@ public class AnalyticsService {
                 .toList();
     }
 
+    public long countRoomCapacityViolations() {
+        return detectRoomCapacityViolations().size();
+    }
+
     /**
      * Detects overlapping schedules in the same room on the same day.
      *
@@ -56,6 +60,10 @@ public class AnalyticsService {
         }
 
         return conflicts;
+    }
+
+    public long countScheduleConflicts() {
+        return detectScheduleConflicts().size();
     }
 
     private boolean isConflict(Schedule first, Schedule second) {

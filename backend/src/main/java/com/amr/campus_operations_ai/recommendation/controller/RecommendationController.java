@@ -29,9 +29,6 @@ public class RecommendationController {
     public ResponseEntity<RecommendationResponse> recommendRoom(@PathVariable Long scheduleId) {
         try {
             RecommendationResponse resp = recommendationService.recommendForSchedule(scheduleId);
-            if (resp.getRecommendedRoom() == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
-            }
             return ResponseEntity.ok(resp);
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
